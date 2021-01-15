@@ -1,141 +1,121 @@
 /* ************************************************************************** */
-/*                                                          LE - /            */
-/*                                                              /             */
-/*   ft_printf.c                                      .::    .:/ .      .::   */
-/*                                                 +:+:+   +:    +:  +:+:+    */
-/*   By: wasayad <wasayad@student.le-101.fr>        +:+   +:    +:    +:+     */
-/*                                                 #+#   #+    #+    #+#      */
-/*   Created: 2019/12/13 19:48:35 by wasayad      #+#   ##    ##    #+#       */
-/*   Updated: 2020/01/20 15:51:14 by wasayad     ###    #+. /#+    ###.fr     */
-/*                                                         /                  */
-/*                                                        /                   */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pbesson <pbesson@student.le-101.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/11/19 13:49:58 by pbesson           #+#    #+#             */
+/*   Updated: 2020/02/17 18:22:21 by pbesson          ###   ########lyon.fr   */
+/*                                                                            */
 /* ************************************************************************** */
 
-#include "../libft.h"
+#include "ft_printf.h"
 
-int		ft_get_arg_into_string(t_printf *b, int j, va_list ap)
+void	ft_reset_flags(t_data_all *st)
 {
-	if (b->d[j] == 'c')
-		if (!(ft_init_c(b, ap)))
+	st->field_size = 0;
+	st->precision = 0;
+	st->size_flags = 0;
+	st->is_precision = 0;
+	st->size_var = 0;
+	st->is_minus = 0;
+	st->is_dot = 0;
+	st->is_var_print = 1;
+	st->tmp_nb = 0;
+	st->nbr_neg = 0;
+	st->star_right = 0;
+	st->star_left = 0;
+	st->is_back_zero = 0;
+	st->type = 0;
+	st->is_zero = 0;
+	st->variable = NULL;
+	st->tmp = NULL;
+	st->tmp2 = NULL;
+}
+
+int		ft_sort(va_list ap, t_data_all *st)
+{
+	if (st->type == 's')
+		if (!ft_init_s(ap, st))
 			return (0);
-	if (b->d[j] == 's')
-		if (!(ft_init_s(b, ap)))
+	if (st->type == 'd' || st->type == 'i')
+		if (!ft_init_d_i(ap, st))
 			return (0);
-	if (b->d[j] == 'd' || b->d[j] == 'i')
-		if (!(ft_init_di(b, ap)))
+	if (st->type == 'c')
+		if (!(st->variable = ft_ctoa(va_arg(ap, int), st)))
 			return (0);
-	if (b->d[j] == 'x')
-		if (!(ft_init_x(b, ap)))
+	if (st->type == 'p')
+		if (!ft_init_p(ap, st))
 			return (0);
-	if (b->d[j] == 'X')
-		if (!(ft_init_xx(b, ap)))
+	if (st->type == 'u')
+		if (!ft_init_u(ap, st))
 			return (0);
-	if (b->d[j] == 'p')
-		if (!(ft_init_p(b, ap)))
+	if (st->type == 'x')
+		if (!ft_init_x(ap, st))
 			return (0);
-	if (b->d[j] == 'u')
-		if (!(ft_init_u(b, ap)))
+	if (st->type == 'X')
+		if (!ft_init_x_maj(ap, st))
 			return (0);
-	if (b->d[j] == '%')
-		if (!(ft_init_pr(b)))
+	if (st->type == '%')
+		if (!(st->variable = ft_ctoa('%', st)))
 			return (0);
 	return (1);
 }
 
-int		ft_sep_arg(va_list ap, t_printf *b)
+int		ft_process(va_list ap, t_data_all *st)
 {
-	int		j;
-
-	j = -1;
-	while (b->conv[++j] == '0' || b->conv[j] == '-' || b->conv[j] == '*' ||
-	b->conv[j] == '.' || (b->conv[j] <= '9' && b->conv[j] >= '0'))
-		if (b->conv[j] == '-')
-			b->flag_neg = 1;
-	j++;
-	if (!(b->d = ft_substr(b->conv, 0, j)))
+	if (!(ft_flags_str(st)))
 		return (0);
-	free(b->conv);
-	b->i = b->i + j;
-	ft_replace_star_by_number(ap, b);
-	ft_check_point(b);
-	ft_check_number(b);
-	if (b->d[0] == '0' && b->flag_neg == 0)
-		b->flag_zero = 1;
-	ft_get_arg_into_string(b, j - 1, ap);
-	ft_add_string_to_render(b);
-	return (1);
-}
-
-int		ft_resolve(char *fmt, va_list ap, t_printf *b)
-{
-	b->i = 0;
-	while (fmt[b->i])
-	{
-		ft_init_flag(b);
-		if (fmt[b->i] == '%')
-		{
-			if (!(b->conv = ft_strdup(fmt + b->i + 1)))
-				return (0);
-			if (!(ft_sep_arg(ap, b)))
-				return (0);
-			free(b->d);
-		}
-		else
-		{
-			if (!(ft_realloc_c(b, fmt[b->i])))
-				return (0);
-		}
-		b->i++;
-	}
-	return (1);
-}
-
-void	ft_write_str(char *str, t_printf *b, int fd)
-{
-	int		i;
-	char	c;
-
-	i = 0;
-	c = '\0';
-	b->len = ft_strlen(str);
-	while (str[i])
-	{
-		if (str[i] == -1 && ft_check_tab(b, i) == 0)
-		{
-			write(fd, &c, 1);
-		}
-		else
-		{
-			write(fd, &str[i], 1);
-		}
-		i++;
-	}
-}
-
-int		ft_printf(int fd, const char *fmt, ...)
-{
-	va_list			ap;
-	t_printf		*b;
-	size_t			i;
-
-	b = init_structing();
-	if (fmt == NULL)
+	ft_detect_flags(ap, st);
+	if (!(ft_sort(ap, st)))
 		return (0);
-	va_start(ap, fmt);
-	if (ft_strchr(fmt, '%') == NULL)
+	st->size_var += ft_strlen(st->variable);
+	if (st->precision < st->size_var && st->type == 's' && st->is_precision)
 	{
-		ft_write_str((char *)fmt, b, fd);
-	}
-	else
-	{
-		if (!(ft_resolve((char *)fmt, ap, b)))
+		if (!(st->variable = ft_substr_free(st->variable, 0, st->precision)))
 			return (0);
-		ft_write_str(b->str, b, fd);
+		st->size_var = st->precision;
 	}
+	if (st->is_back_zero)
+		st->size_var = 1;
+	if (!(ft_flags_process(st)))
+		return (0);
+	st->total_size += st->size_var;
+	if (st->is_back_zero && st->is_minus)
+		ft_putchar('\0');
+	ft_putstr(st->variable);
+	if (st->is_back_zero && !st->is_minus)
+		ft_putchar('\0');
+	ft_strdel(st->flags);
+	ft_strdel(st->variable);
+	return (1);
+}
+
+int		ft_printf(const char *str, ...)
+{
+	va_list		ap;
+	t_data_all	st[1];
+
+	st->i = 0;
+	st->total_size = 0;
+	va_start(ap, str);
+	if (!(st->str = ft_strdup(str)))
+		return (-1);
+	while (st->str[st->i])
+	{
+		ft_reset_flags(st);
+		if (st->str[st->i] == '%')
+			if (!(ft_process(ap, st)))
+				return (0);
+		if (st->str[st->i] != '\0' && st->str[st->i] != '%')
+		{
+			ft_putchar(st->str[st->i]);
+			st->total_size++;
+			st->i++;
+		}
+	}
+	ft_strdel(st->str);
 	va_end(ap);
-	i = b->len;
-	free(b->index_0);
-	free(b->str);
-	free(b);
-	return (i);
+	return (st->total_size);
 }
