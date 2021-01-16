@@ -9,14 +9,16 @@ void	ft_env(t_minishell *ms)
 	ms->line = ft_strdup("");
 	while (temp->last != 1)
 	{
-		ms->line = ft_strjoin_free_s1(ms->line, temp->var);
-		ms->line = ft_strjoin_free_s1(ms->line, "=");
-		ms->line = ft_strjoin_free_s1(ms->line, temp->content);
-		ms->line = ft_strjoin_free_s1(ms->line, "\n");
+		ft_printf("%s=%s\n", temp->var, temp->content);
+		//ms->line = ft_strjoin_free_s1(ms->line, temp->var);
+		//ms->line = ft_strjoin_free_s1(ms->line, "=");
+		//ms->line = ft_strjoin_free_s1(ms->line, temp->content);
+		//ms->line = ft_strjoin_free_s1(ms->line, "\n");
 		temp = temp->next_var;
 	}
-	ms->line = ft_strjoin_free_s1(ms->line, temp->var);
-	ms->line = ft_strjoin_free_s1(ms->line, "=");
-	ms->line = ft_strjoin_free_s1(ms->line, temp->content);
-	ms->line = ft_strjoin_free_s1(ms->line, "\n");
+	ft_printf("%s=%s\n", temp->var, temp->content);
+	//ms->line = ft_strjoin_free_s1(ms->line, temp->var);
+	//ms->line = ft_strjoin_free_s1(ms->line, "=");
+	//ms->line = ft_strjoin_free_s1(ms->line, temp->content);
+	//ms->line = ft_strjoin_free_s1(ms->line, "\n");
 }

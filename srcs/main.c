@@ -1,5 +1,5 @@
 #include "../includes/minishell.h"
-
+// PROBLEME PARSING REFAIRE POUR QUE CA FONCTIONNE AVEC PIPE
 int		ft_find_equal(char *envp)
 {
 	int		i;
@@ -103,17 +103,19 @@ void	get_path_arg(t_minishell *ms)
 		{
 			break;
 		}
-		ft_printf("%s = %d\n", tempo, id);
+		//ft_printf("%s = %d\n", tempo, id);
 		close(id);
 		free(tempo);
 		i++;
 	}
+	ft_printf("solution %s = %d\n", tempo, id);
 	ms->line = ft_strjoin_free_s2(" ", ms->line);
 	ms->line = ft_strjoin_free_s2(ms->command, ms->line);
 	ms->argv = ft_split(ms->line, ' ');
 	ms->argv[0] = tempo;
+	ft_printf("%s %s = %d\n", ms->argv[0], ms->argv[2]);
 }
-
+#include "stdio.h"
 void	try_exec(t_minishell *ms)
 {
 	int		id;
@@ -142,6 +144,7 @@ void	try_exec(t_minishell *ms)
 		}
 		close(ms->pfd[0]);
 	}
+	ft_printf("%s", ms->line);
 	free(buffer);
 }
 void	get_different_option(t_minishell *ms, int i)
@@ -170,11 +173,31 @@ void	get_different_option(t_minishell *ms, int i)
 void	manage_pipe(t_minishell *ms, int i)
 {
 	int		j;
-
+	int		id;
+	int		fd[2];
 	j = 0;
 	ms->command_pipe = ft_split(ms->command_tab[i], -54);
 	while (ms->command_pipe[j])
 	{
+		pipe(fd);
+		id = fork();
+		if (id == 0)
+		{
+			if (i == 0)
+			{
+				//dup2(fd[1], STDOUT_FILENO);
+			}
+			else if (ms->command_pipe[i + 1] && i != 0)
+			{
+				//dup2(fd[1], STDOUT_FILENO);
+				//dup2(fd[0], STDIN_FILENO);
+			}
+			else
+			{
+				//dup2(fd[0], STDIN_FILENO);
+			}
+			get_different_option(ms, i);
+		}
 		ft_printf("%s\n", ms->command_pipe[j]);
 		j++;
 	}
