@@ -82,18 +82,36 @@ int		get_command(t_minishell *ms)
 
 void	get_path_arg(t_minishell *ms)
 {
-	t_env_var *temp;
-
+	t_env_var	*temp;
+	char		**path;
+	int			i;
+	char		*tempo;
+	int			id;
+	i = 0;
 	temp = ms->ev;
-
 	while (temp->last != 1 && ft_strcmp(temp->var, "PATH") != 0)
 	{
 		temp = temp->next_var;
 	}
+	path = ft_split(temp->content, ':');
+	while(path[i])
+	{
+		tempo = ft_strjoin(path[i], "/");
+		tempo = ft_strjoin_free_s1(tempo, ms->command);
+		id = open(tempo, O_RDONLY);
+		if (id > 0)
+		{
+			break;
+		}
+		ft_printf("%s = %d\n", tempo, id);
+		close(id);
+		free(tempo);
+		i++;
+	}
 	ms->line = ft_strjoin_free_s2(" ", ms->line);
 	ms->line = ft_strjoin_free_s2(ms->command, ms->line);
 	ms->argv = ft_split(ms->line, ' ');
-	ms->argv[0] = ft_strjoin_free_s2("/bin/", ms->argv[0]);
+	ms->argv[0] = tempo;
 }
 
 void	try_exec(t_minishell *ms)
@@ -119,7 +137,6 @@ void	try_exec(t_minishell *ms)
 		close(ms->pfd[1]);
 		while (((ret = read(ms->pfd[0], buffer, 1023)) > 0))
 		{
-				ft_printf("%s\n", buffer);
 			buffer[ret] = 0;
 			ms->line = ft_strjoin_free_s1(ms->line, buffer);
 		}
@@ -196,6 +213,7 @@ void	manage_inf(t_minishell *ms, int i)
 			ft_exit(ms);
 		free(ms->line);
 		ms->line = ms->command_inf[0];
+			ft_printf("%s\n", ms->line);
 	}
 	else if (ft_strchr(ms->command_tab[i], -53))
 	{

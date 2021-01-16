@@ -20,43 +20,45 @@ int main(void)
     int pid;
     char    *argv[6];
     argv[0] = "/bin/ls";
-    argv[1] = "/bin/cat";
+    argv[1] = "/bin/ls";
     int fd;
-
-    fd = open("/bin/lsez", O_RDONLY); // pour trouver le bon executable utiliser open sans oublier de close
+    //hello world
+    fd = open("./main.c", O_RDONLY); // pour trouver le bon executable utiliser open sans oublier de close
     printf("%d\n", fd);
-    char    *argv1[3][3];
+    char    *argv1[3][5];
     argv1[0][0] = "ls";
     argv1[0][1] = NULL;
-    argv1[1][0] = "cat";
-    argv1[1][1] = "/home/user42/42/minish/test.c";
-    while(i < 2)
-    {
-        pid = fork();
-        //dprintf(1, "actual ID = %d\n", pid);
-        if (pid == 0)
-        {
-            //dprintf(1, "%s\n",argv1[i][0]);
-            if (i + 1 < 2)
-            {
-                dup2(pfd[1], 1);
-            }
-            else
-                dup2(pfd[1], 1);
-            execve(argv[i], argv1[i], NULL);
-        }
-        else
-        {
-                close(pfd[1]);
-             while ((ret = read(pfd[0], buffer, 1023)) > 0)
-             {
-                 buffer[ret] = 0;
-                 printf("%s\n", buffer);
-             }
-             close(pfd[0]);
-        }
-        i++;
-    }
+    argv1[1][0] = "ls";
+    argv1[1][4] = "-i";
+    argv1[1][2] = "/home/user42/42/minish/test.c";
+    argv1[1][1] = NULL;
+    //while(i < 2)
+    //{
+       // pid = fork();
+       // //dprintf(1, "actual ID = %d\n", pid);
+       // if (pid == 0)
+       // {
+       //     //dprintf(1, "%s\n",argv1[i][0]);
+       //     if (i + 1 < 2)
+       //     {
+       //         dup2(pfd[1], 1);
+       //     }
+       //     else
+       //         dup2(pfd[0], 0);
+            execve(argv[1], argv1[1], NULL);
+       // }
+       //else
+       //{
+       //        close(pfd[1]);
+       //     while ((ret = read(pfd[0], buffer, 1023)) > 0)
+       //     {
+       //         buffer[ret] = 0;
+       //         printf("%s\n", buffer);
+       //     }
+       //     close(pfd[0]);
+       //}
+    //    i++;
+    //}
     // int     i = 0;
     // int     stdoutcopy = dup(1);
     //  dprintf(1, "hey");
