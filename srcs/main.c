@@ -80,7 +80,22 @@ int		get_command(t_minishell *ms)
 	return (1);
 }
 
-void	get_path_arg(t_minishell *ms)
+int		get_pipe_index(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == -54)
+			break;
+		i++;
+	}
+	return (i);
+}
+#include "stdio.h"
+
+void	get_path_arg(t_minishell *ms, int j)
 {
 	t_env_var	*temp;
 	char		**path;
@@ -89,11 +104,12 @@ void	get_path_arg(t_minishell *ms)
 	int			id;
 	i = 0;
 	temp = ms->ev;
+	printf("here is my new line %s\n", ms->command_tab[j]);
 	while (temp->last != 1 && ft_strcmp(temp->var, "PATH") != 0)
-	{
 		temp = temp->next_var;
-	}
+	printf("here is my new line %s\n", ms->command_tab[j]);
 	path = ft_split(temp->content, ':');
+	printf("here is my new line %s\n", ms->command_tab[j]);
 	while(path[i])
 	{
 		tempo = ft_strjoin(path[i], "/");
@@ -101,6 +117,7 @@ void	get_path_arg(t_minishell *ms)
 		id = open(tempo, O_RDONLY);
 		if (id > 0)
 		{
+			close(id);
 			break;
 		}
 		//ft_printf("%s = %d\n", tempo, id);
@@ -108,21 +125,22 @@ void	get_path_arg(t_minishell *ms)
 		free(tempo);
 		i++;
 	}
-	ft_printf("solution %s = %d\n", tempo, id);
-	ms->line = ft_strjoin_free_s2(" ", ms->line);
-	ms->line = ft_strjoin_free_s2(ms->command, ms->line);
-	ms->argv = ft_split(ms->line, ' ');
+	ms->temp = ft_substr(ms->command_tab[j], 0, get_pipe_index(ms->command_tab[j]));
+	ms->temp = ft_strjoin_free_s2(" ", ms->temp);
+	ms->temp = ft_strjoin_free_s2(ms->command, ms->temp);
+	ms->argv = ft_split(ms->temp, ' ');
 	ms->argv[0] = tempo;
-	ft_printf("%s %s = %d\n", ms->argv[0], ms->argv[2]);
+	free(ms->temp);
+	//printf("%s %s = %d\n", ms->argv[0], ms->argv[1]);
 }
-#include "stdio.h"
-void	try_exec(t_minishell *ms)
+
+void	try_exec(t_minishell *ms, int i)
 {
 	int		id;
 	int		ret;
 	char	*buffer;
 
-	get_path_arg(ms);
+	get_path_arg(ms, i);
 	buffer = malloc(sizeof(char *) * 10000);
 	pipe(ms->pfd);
 	id = fork();
@@ -145,6 +163,10 @@ void	try_exec(t_minishell *ms)
 		close(ms->pfd[0]);
 	}
 	ft_printf("%s", ms->line);
+	id = 0;
+	while (ms->argv[id])
+		free(ms->argv[id++]);
+	free(ms->argv);
 	free(buffer);
 }
 void	get_different_option(t_minishell *ms, int i)
@@ -167,7 +189,7 @@ void	get_different_option(t_minishell *ms, int i)
 	else if (ft_strcmp(ms->command, "env") == 0)
 		ft_env(ms);
 	else
-		try_exec(ms);
+		try_exec(ms, i);
 }
 
 void	manage_pipe(t_minishell *ms, int i)

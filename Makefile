@@ -26,7 +26,7 @@ HEADERS = includes/minishell.h
 OBJ = $(SRC:.c=.o) libft/libft.a
 NAME = minishell
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -fsanitize=leak
+CFLAGS = -Wall -Wextra -Werror -fsanitize=address
 SANITIZE = -Wall -Wextra -Werror
 RM = rm -f
 
