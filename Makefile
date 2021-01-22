@@ -6,11 +6,11 @@
 #    By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/14 14:02:44 by pbesson           #+#    #+#              #
-#    Updated: 2021/01/19 15:23:14 by wasayad          ###   ########lyon.fr    #
+#    Updated: 2021/01/22 16:14:33 by wasayad          ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
-SRC =	srcs/main.c\
+SRC =	srcs/main2.c\
 		srcs/echo.c\
 		srcs/utils.c\
 		srcs/exit.c\
@@ -19,7 +19,13 @@ SRC =	srcs/main.c\
 		srcs/export.c\
 		srcs/unset.c\
 		srcs/env.c\
-		srcs/parsing.c	
+		srcs/parsing.c\
+		srcs/pipe/exec_pipe_inf.c\
+		srcs/pipe/pipe.c\
+		srcs/pipe/pipe_inf.c\
+		srcs/pipe/exec_pipe.c\
+		srcs/inf/inf.c\
+		srcs/inf/exec_inf.c
 		
 
 LIBFT_PATH = ./libft

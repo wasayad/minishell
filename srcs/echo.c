@@ -18,7 +18,7 @@ int		get_echo(t_minishell *ms)
 {
 	if (ms->line[0] == '-' && ms->line[1] == 'n')
 	{
-		if (!(get_command(ms)))
+		if (!(get_command(ms, 0)))
 			return (0);
 	}
 	else

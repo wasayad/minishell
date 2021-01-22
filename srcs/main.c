@@ -344,27 +344,7 @@ int		get_command_pipe(t_minishell *ms, int k)
 	return (1);
 }
 
-void	get_different_option_pipe_inf(t_minishell *ms, int i)
-{
-	if (!(get_command_pipe_inf(ms, i)))
-		ft_exit(ms);
-	if (ft_strcmp(ms->command, "echo") == 0)
-		get_echo(ms);
-	else if (ft_strcmp(ms->command, "pwd") == 0)
-		ft_pwd(ms);
-	else if (ft_strcmp(ms->command, "cd") == 0)
-		ft_cd(ms);
-	else if (ft_strcmp(ms->command, "exit") == 0)
-		check_exit(ms);
-	else if (ft_strcmp(ms->command, "export") == 0)
-		ft_export(ms);
-	else if (ft_strcmp(ms->command, "unset") == 0)
-		ft_unset(ms);
-	else if (ft_strcmp(ms->command, "env") == 0)
-		ft_env(ms);
-	else
-		try_exec_pipe_inf(ms, i);
-}
+
 
 void	get_different_option_pipe(t_minishell *ms, int i)
 {

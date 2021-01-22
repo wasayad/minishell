@@ -33,7 +33,7 @@ typedef struct		s_minishell
 
 int			get_quotes(t_minishell *ms);
 int			get_echo(t_minishell *ms);
-int			get_command(t_minishell *ms);
+int			get_command(t_minishell *ms, int i);
 void		ft_exit(t_minishell *ms);
 void		check_exit(t_minishell *ms);
 
@@ -54,7 +54,13 @@ void	    ft_env(t_minishell *ms);
 
 
 void	manage_inf(t_minishell *ms, int i);
+void	manage_pipe(t_minishell *ms, int i);
+void	manage_inf_pipe(t_minishell *ms, int i);
 
+void	get_different_option(t_minishell *ms, int i);
+void	get_different_option_pipe(t_minishell *ms, int i);
+void	get_different_option_pipe_inf(t_minishell *ms, int i);
+int		get_command_pipe_inf(t_minishell *ms, int k);
 
 int		ischaracter_quotes(t_minishell *ms, int i);
 int		ischaracter_squotes(t_minishell *ms, int i);

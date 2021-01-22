@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbesson <pbesson@student.le-101.fr>        +#+  +:+       +#+        */
+/*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/18 13:05:34 by pbesson           #+#    #+#             */
-/*   Updated: 2020/03/21 14:10:36 by pbesson          ###   ########lyon.fr   */
+/*   Updated: 2021/01/22 16:14:09 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,6 @@ int		ft_norme_2(int *ret, char **line, char **str, char **storage)
 	{
 		if (!(*line = ft_strdup(*str)))
 			return (-1);
-		if (*storage == NULL)
-			ft_strdel(*str);
 		ft_strdel(*storage);
 		return (0);
 	}
