@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: akerdeka <akerdeka@student.42lyon.fr>      +#+  +:+       +#+         #
+#    By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/14 14:02:44 by pbesson           #+#    #+#              #
-#    Updated: 2020/09/29 19:17:40 by akerdeka         ###   ########lyon.fr    #
+#    Updated: 2021/01/19 15:23:14 by wasayad          ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,14 +19,15 @@ SRC =	srcs/main.c\
 		srcs/export.c\
 		srcs/unset.c\
 		srcs/env.c\
-		srcs/parsing.c
+		srcs/parsing.c	
+		
 
 LIBFT_PATH = ./libft
 HEADERS = includes/minishell.h
 OBJ = $(SRC:.c=.o) libft/libft.a
 NAME = minishell
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g3 #-fsanitize=address
 SANITIZE = -Wall -Wextra -Werror
 RM = rm -f
 

@@ -23,8 +23,7 @@ int		get_echo(t_minishell *ms)
 	}
 	else
 	{
-		ft_printf("%s\n", ms->line);
-		//ms->line = ft_strjoin_free_s1(ms->line, "\n");
+		ms->line = ft_strjoin_free_s1(ms->line, "\n");
 	}
 	return (1);
 }

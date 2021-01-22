@@ -17,8 +17,6 @@ typedef struct		s_minishell
     int     fd;
     int     pfd[2];
 	char	*line;
-    char    *temp;
-    int     is_pipe;
     char	*command;
     char    **command_tab;
     char	*current_workdir;
