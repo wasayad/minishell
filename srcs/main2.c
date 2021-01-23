@@ -77,10 +77,14 @@ static void		main_manager(t_minishell *ms, int i)
 	else if (ft_strchr(ms->command_tab[i], -51) ||
 	ft_strchr(ms->command_tab[i], -52)
 	|| ft_strchr(ms->command_tab[i], -53))
+	{
+		free(ms->line);
+		ms->line = ft_strdup("");
 		manage_inf(ms, i);
+		ft_printf("%s\n", ms->line);
+	}
 	else
 	{
-		ms->line = ms->command_tab[i];
 		get_different_option(ms, i);
 		ft_printf("%s", ms->line);
 		ft_strdel(ms->line);
@@ -103,6 +107,11 @@ int				main(int argc __attribute__((unused)),
 		ft_testing(ms);
 		while (ms->command_tab[i])
 		{
+			int j = 0;
+				while (ms->command_tab[j])
+				{
+					j++;
+				}
 			main_manager(ms, i);
 			//ft_strdel(ms->command_tab[i]);
 			i++;

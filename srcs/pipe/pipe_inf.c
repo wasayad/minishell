@@ -6,7 +6,7 @@
 /*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:21:36 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/22 15:44:05 by wasayad          ###   ########lyon.fr   */
+/*   Updated: 2021/01/23 16:52:01 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void	manage_command_52(t_minishell *ms, int i)
 		ft_exit(ms);
 	free(ms->line);
 	ms->line = ms->command_inf[0];
-	ft_printf("%s\n", ms->line);
 }
 
 void	manage_command_53(t_minishell *ms, int i, int j, int k)

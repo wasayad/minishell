@@ -6,28 +6,30 @@
 /*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 15:44:55 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/22 16:11:41 by wasayad          ###   ########lyon.fr   */
+/*   Updated: 2021/01/23 16:47:36 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
-
+#include "stdio.h"
 int			get_command(t_minishell *ms, int i)
 {
 	int j;
+	int	k;
 
-	i = 0;
+	k = 0;
 	j = 0;
-	while (ms->line[i] && ms->line[i] == ' ')
-		i++;
-	j = i;
-	while (ms->line[j] && ms->line[j] != ' ')
+	while (ms->command_tab[i][k] && ms->command_tab[i][k] == ' ')
+		k++;
+	j = k;
+	while (ms->command_tab[i][j] && ms->command_tab[i][j] != ' ')
 		j++;
-	if (!(ms->command = ft_substr(ms->line, i, j - i)))
+	if (!(ms->command = ft_substr(ms->command_tab[i], k, j - k)))
 		return (0);
-	while (ms->line[j] && ms->line[j] == ' ')
+	while (ms->command_tab[i][j] && ms->command_tab[i][j] == ' ')
 		j++;
-	if (!(ms->line = ft_substr_free(ms->line, j, ft_strlen(ms->line))))
+	if (!(ms->command_tab[i] = ft_substr_free(ms->command_tab[i], j,
+	ft_strlen(ms->command_tab[i]))))
 		return (0);
 	return (1);
 }
@@ -58,7 +60,9 @@ void	get_path_arg(t_minishell *ms)
 	ms->line = ft_strjoin_free_s2(" ", ms->line);
 	ms->line = ft_strjoin_free_s2(ms->command, ms->line);
 	ms->argv = ft_split(ms->line, ' ');
-	ms->argv[0] = tempo;
+	free(ms->argv[0]);
+	ms->argv[0] = ft_strdup(tempo);
+	free(tempo);
 }
 
 static void	try_exec_read(t_minishell *ms)
@@ -78,10 +82,13 @@ static void	try_exec_read(t_minishell *ms)
 	close(ms->pfd[0]);
 	free(buffer);
 }
+
 static void	try_exec(t_minishell *ms)
 {
 	int		id;
 
+	free(ms->line);
+	ms->line = ft_strdup("");
 	get_path_arg(ms);
 	pipe(ms->pfd);
 	id = fork();
@@ -99,7 +106,6 @@ static void	try_exec(t_minishell *ms)
 
 void	get_different_option(t_minishell *ms, int i)
 {
-	i = 0;
 	if (!(get_command(ms, i)))
 		ft_exit(ms);
 	if (ft_strcmp(ms->command, "echo") == 0)

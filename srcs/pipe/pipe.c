@@ -6,12 +6,12 @@
 /*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:10:58 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/22 16:28:24 by wasayad          ###   ########lyon.fr   */
+/*   Updated: 2021/01/23 13:43:34 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
-#include "stdio.h"
+
 static void	manage_dup_loop(t_minishell *ms, int **fd, int tempstdout, int j)
 {
 	int		tempstdin;
