@@ -6,7 +6,7 @@
 /*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:39:13 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/22 16:03:28 by wasayad          ###   ########lyon.fr   */
+/*   Updated: 2021/01/28 12:12:27 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,18 +45,25 @@ void	get_path_arg_pipe_inf(t_minishell *ms)
 
 	i = -1;
 	temp = ms->ev;
-	while (temp->last != 1 && ft_strcmp(temp->var, "PATH") != 0)
-		temp = temp->next_var;
-	path = ft_split(temp->content, ':');
-	while (path[++i])
+	if (ms->command[0] == '/')
 	{
-		tempo = ft_strjoin(path[i], "/");
-		tempo = ft_strjoin_free_s1(tempo, ms->command);
-		id = open(tempo, O_RDONLY);
-		if (id > 0)
-			break ;
-		close(id);
-		free(tempo);
+		tempo = ft_strdup(ms->command);
+	}
+	else
+	{
+		while (temp->last != 1 && ft_strcmp(temp->var, "PATH") != 0)
+			temp = temp->next_var;
+		path = ft_split(temp->content, ':');
+		while (path[++i])
+		{
+			tempo = ft_strjoin(path[i], "/");
+			tempo = ft_strjoin_free_s1(tempo, ms->command);
+			id = open(tempo, O_RDONLY);
+			if (id > 0)
+				break ;
+			close(id);
+			free(tempo);
+		}
 	}
 	ms->command_inf[0] = ft_strjoin_free_s2(" ", ms->command_inf[0]);
 	ms->command_inf[0] = ft_strjoin_free_s2(ms->command, ms->command_inf[0]);
@@ -64,25 +71,29 @@ void	get_path_arg_pipe_inf(t_minishell *ms)
 	ms->argv[0] = tempo;
 }
 
-void	try_exec_pipe_inf_read(t_minishell *ms)
+void	try_exec_pipe_inf_read(t_minishell *ms, int i)
 {
 	int		ret;
 	char	*buffer;
 
-	buffer = malloc(sizeof(char *) * 10000);
-	free(ms->line);
-	ms->line = ft_strdup("");
-	close(ms->pfd[1]);
-	while (((ret = read(ms->pfd[0], buffer, 1023)) > 0))
+	if (!(ft_strchr(ms->command_pipe[i], -52)))
 	{
-		buffer[ret] = 0;
-		ms->line = ft_strjoin_free_s1(ms->line, buffer);
+		buffer = malloc(sizeof(char *) * 10000);
+		free(ms->line);
+		ms->line = ft_strdup("");
+		close(ms->pfd[1]);
+		while (((ret = read(ms->pfd[0], buffer, 1023)) > 0))
+		{
+			buffer[ret] = 0;
+			ms->line = ft_strjoin_free_s1(ms->line, buffer);
+		}
+		close(ms->pfd[0]);
+		free(buffer);
 	}
-	close(ms->pfd[0]);
-	free(buffer);
 }
 
-void	try_exec_pipe_inf(t_minishell *ms)
+#include "stdio.h"
+void	try_exec_pipe_inf(t_minishell *ms, int i)
 {
 	int		id;
 
@@ -92,11 +103,17 @@ void	try_exec_pipe_inf(t_minishell *ms)
 	if (id == 0)
 	{
 		close(ms->pfd[0]);
-		dup2(ms->pfd[1], 1);
-		execve(ms->argv[0], ms->argv, NULL);
+		if (!(ft_strchr(ms->command_pipe[i], -52)))
+			dup2(ms->pfd[1], 1);
+		execve(ms->argv[0], ms->argv, ms->envp);
+		dprintf(2, "%s\n", strerror(errno));
+		exit(1);
 	}
 	else
-		try_exec_pipe_inf_read(ms);
+	{
+		wait(0);
+		try_exec_pipe_inf_read(ms, i);
+	}
 }
 
 void	get_different_option_pipe_inf(t_minishell *ms, int i)
@@ -104,9 +121,13 @@ void	get_different_option_pipe_inf(t_minishell *ms, int i)
 	if (!(get_command_pipe_inf(ms, i)))
 		ft_exit(ms);
 	if (ft_strcmp(ms->command, "echo") == 0)
-		get_echo(ms);
+		get_echo_inf(ms, i);
 	else if (ft_strcmp(ms->command, "pwd") == 0)
 		ft_pwd(ms);
+	else if (ft_strcmp(ms->command, "cd") == 0)
+		ft_printf("");
+	else if (ft_strcmp(ms->command, "exit") == 0)
+		ft_printf("");
 	else if (ft_strcmp(ms->command, "export") == 0)
 		ft_export(ms);
 	else if (ft_strcmp(ms->command, "unset") == 0)
@@ -114,5 +135,5 @@ void	get_different_option_pipe_inf(t_minishell *ms, int i)
 	else if (ft_strcmp(ms->command, "env") == 0)
 		ft_env(ms);
 	else
-		try_exec_pipe_inf(ms);
+		try_exec_pipe_inf(ms, i);
 }

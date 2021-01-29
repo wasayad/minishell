@@ -14,16 +14,50 @@
 //GERER LES EXIT
 //PARSING CASSE SUR LE CAS '"salut"' '"salut"'
 
-int		get_echo(t_minishell *ms)
+int		get_echo(t_minishell *ms, int i)
 {
-	if (ms->line[0] == '-' && ms->line[1] == 'n')
+	if (ms->command_tab[i][0] == '-' && ms->command_tab[i][1] == 'n')
+	{
+		if (!(get_command(ms, i)))
+			return (0);
+		ms->line = ft_strdup(ms->command_tab[i]);
+	}
+	else
+	{
+		ft_strdel_free(&(ms->line));
+		ms->line = ft_strjoin_free_s1(ms->command_tab[i], "\n");
+	}
+	return (1);
+}
+
+int		get_echo_pipe(t_minishell *ms, int i)
+{
+	if (ms->command_pipe[i][0] == '-' && ms->command_pipe[i][1] == 'n')
 	{
 		if (!(get_command(ms, 0)))
 			return (0);
 	}
 	else
 	{
-		ms->line = ft_strjoin_free_s1(ms->line, "\n");
+		ft_printf("%s\n", ms->command_pipe[i]);
+		ft_strdel_free(&(ms->line));
+		ms->line = ft_strjoin_free_s1(ms->command_pipe[i], "\n");
+	}
+	return (1);
+}
+
+int		get_echo_inf(t_minishell *ms, int i)
+{
+	i = 0;
+	if (ms->command_inf[0][0] == '-' && ms->command_inf[0][1] == 'n')
+	{
+		if (!(get_command(ms, 0)))
+			return (0);
+	}
+	else
+	{
+		ft_strdel_free(&(ms->line));
+		ms->line = ft_strjoin_free_s1(ms->command_inf[0], "\n");
 	}
 	return (1);
 }

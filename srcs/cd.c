@@ -6,7 +6,7 @@
 /*   By: akerdeka <akerdeka@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/29 17:20:08 by akerdeka          #+#    #+#             */
-/*   Updated: 2020/09/29 19:25:45 by akerdeka         ###   ########lyon.fr   */
+/*   Updated: 2021/01/25 14:12:44 by akerdeka         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,21 +23,23 @@ static void	ft_cd_errors(t_minishell *ms)
 	if (errno == 20)
 		ft_printf("%s is not a directory.\n", ms->line);
 	errno = 0;
+	ft_strdel_free(&(ms->line));
+	ms->line = ft_strdup("");
 }
 
-int			ft_cd(t_minishell *ms)
+int			ft_cd(t_minishell *ms, int j)
 {
 	int		i;
 	char	*str;
 
 	i = -1;
-	if (!(str = malloc(sizeof(char*) * (ft_strlen(ms->line) + 1))))
+	if (!(str = malloc(sizeof(char*) * (ft_strlen(ms->command_tab[j]) + 1))))
 		ft_exit(ms);
-	while (ms->line[++i])
+	while (ms->command_tab[j][++i])
 	{
-		while (ms->line[i] == ' ')
+		while (ms->command_tab[j][i] == ' ')
 		{
-			if (ms->line[i + 1] != ' ' && ms->line[i + 1] != '\0')
+			if (ms->command_tab[j][i + 1] != ' ' && ms->command_tab[j][i + 1] != '\0')
 			{
 				ft_printf("Too much arguments.\n");
 				free(str);
@@ -45,7 +47,7 @@ int			ft_cd(t_minishell *ms)
 			}
 			i++;
 		}
-		str[i] = ms->line[i];
+		str[i] = ms->command_tab[j][i];
 	}
 	str[i] = '\0';
 	chdir(str);

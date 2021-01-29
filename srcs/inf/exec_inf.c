@@ -6,7 +6,7 @@
 /*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 15:44:55 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/23 16:47:36 by wasayad          ###   ########lyon.fr   */
+/*   Updated: 2021/01/28 12:07:15 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int			get_command(t_minishell *ms, int i)
 	return (1);
 }
 
-void	get_path_arg(t_minishell *ms)
+void	get_path_arg(t_minishell *ms, int j)
 {
 	t_env_var	*temp;
 	char		**path;
@@ -44,25 +44,32 @@ void	get_path_arg(t_minishell *ms)
 
 	i = -1;
 	temp = ms->ev;
-	while (temp->last != 1 && ft_strcmp(temp->var, "PATH") != 0)
-		temp = temp->next_var;
-	path = ft_split(temp->content, ':');
-	while (path[++i])
+	if (ms->command[0] == '/')
 	{
-		tempo = ft_strjoin(path[i], "/");
-		tempo = ft_strjoin_free_s1(tempo, ms->command);
-		id = open(tempo, O_RDONLY);
-		if (id > 0)
-			break ;
-		close(id);
-		free(tempo);
+		tempo = ft_strdup(ms->command);
 	}
-	ms->line = ft_strjoin_free_s2(" ", ms->line);
-	ms->line = ft_strjoin_free_s2(ms->command, ms->line);
-	ms->argv = ft_split(ms->line, ' ');
+	else
+	{
+		while (temp->last != 1 && ft_strcmp(temp->var, "PATH") != 0)
+			temp = temp->next_var;
+		path = ft_split(temp->content, ':');
+		while (path[++i])
+		{
+			tempo = ft_strjoin(path[i], "/");
+			tempo = ft_strjoin_free_s1(tempo, ms->command);
+			id = open(tempo, O_RDONLY);
+			if (id > 0 || path[i + 1] == NULL)
+				break ;
+			close(id);
+			free(tempo);
+		}
+	}
+	ms->command_tab[j] = ft_strjoin_free_s2(" ", ms->command_tab[j]);
+	ms->command_tab[j] = ft_strjoin_free_s2(ms->command, ms->command_tab[j]);
+	ms->argv = ft_split(ms->command_tab[j], ' ');
 	free(ms->argv[0]);
 	ms->argv[0] = ft_strdup(tempo);
-	free(tempo);
+	ft_strdel_free(&(tempo));
 }
 
 static void	try_exec_read(t_minishell *ms)
@@ -71,7 +78,7 @@ static void	try_exec_read(t_minishell *ms)
 	char	*buffer;
 
 	buffer = malloc(sizeof(char *) * 10000);
-	free(ms->line);
+	ft_strdel_free(&(ms->line));
 	ms->line = ft_strdup("");
 	close(ms->pfd[1]);
 	while (((ret = read(ms->pfd[0], buffer, 1023)) > 0))
@@ -83,23 +90,28 @@ static void	try_exec_read(t_minishell *ms)
 	free(buffer);
 }
 
-static void	try_exec(t_minishell *ms)
+static void	try_exec(t_minishell *ms, int i)
 {
 	int		id;
 
-	free(ms->line);
+	ft_strdel_free(&(ms->line));
 	ms->line = ft_strdup("");
-	get_path_arg(ms);
+	get_path_arg(ms, i);
 	pipe(ms->pfd);
 	id = fork();
 	if (id == 0)
 	{
 		close(ms->pfd[0]);
 		dup2(ms->pfd[1], 1);
-		execve(ms->argv[0], ms->argv, NULL);
+		if (execve(ms->argv[0], ms->argv, ms->envp) == -1)
+		{
+			dprintf(2, "%s\n", strerror(errno));
+			exit(1);
+		}
 	}
 	else
 	{
+		wait(0);
 		try_exec_read(ms);
 	}
 }
@@ -108,14 +120,15 @@ void	get_different_option(t_minishell *ms, int i)
 {
 	if (!(get_command(ms, i)))
 		ft_exit(ms);
+	ft_printf("%s\n", ms->command);
 	if (ft_strcmp(ms->command, "echo") == 0)
-		get_echo(ms);
+		get_echo(ms, i);
 	else if (ft_strcmp(ms->command, "pwd") == 0)
 		ft_pwd(ms);
 	else if (ft_strcmp(ms->command, "cd") == 0)
-		ft_cd(ms);
+		ft_cd(ms, i);
 	else if (ft_strcmp(ms->command, "exit") == 0)
-		check_exit(ms);
+		check_exit(ms, i);
 	else if (ft_strcmp(ms->command, "export") == 0)
 		ft_export(ms);
 	else if (ft_strcmp(ms->command, "unset") == 0)
@@ -123,5 +136,5 @@ void	get_different_option(t_minishell *ms, int i)
 	else if (ft_strcmp(ms->command, "env") == 0)
 		ft_env(ms);
 	else
-		try_exec(ms);
+		try_exec(ms, i);
 }
