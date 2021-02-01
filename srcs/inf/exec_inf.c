@@ -6,12 +6,12 @@
 /*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 15:44:55 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/28 12:07:15 by wasayad          ###   ########lyon.fr   */
+/*   Updated: 2021/02/01 15:06:13 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
-#include "stdio.h"
+
 int			get_command(t_minishell *ms, int i)
 {
 	int j;
@@ -72,23 +72,23 @@ void	get_path_arg(t_minishell *ms, int j)
 	ft_strdel_free(&(tempo));
 }
 
-static void	try_exec_read(t_minishell *ms)
-{
-	int		ret;
-	char	*buffer;
-
-	buffer = malloc(sizeof(char *) * 10000);
-	ft_strdel_free(&(ms->line));
-	ms->line = ft_strdup("");
-	close(ms->pfd[1]);
-	while (((ret = read(ms->pfd[0], buffer, 1023)) > 0))
-	{
-		buffer[ret] = 0;
-		ms->line = ft_strjoin_free_s1(ms->line, buffer);
-	}
-	close(ms->pfd[0]);
-	free(buffer);
-}
+//static void	try_exec_read(t_minishell *ms)
+//{
+//	int		ret;
+//	char	*buffer;
+//
+//	buffer = malloc(sizeof(char *) * 10000);
+//	ft_strdel_free(&(ms->line));
+//	ms->line = ft_strdup("");
+//	close(ms->pfd[1]);
+//	while (((ret = read(ms->pfd[0], buffer, 1023)) > 0))
+//	{
+//		buffer[ret] = 0;
+//		ms->line = ft_strjoin_free_s1(ms->line, buffer);
+//	}
+//	close(ms->pfd[0]);
+//	free(buffer);
+//}
 
 static void	try_exec(t_minishell *ms, int i)
 {
@@ -97,30 +97,32 @@ static void	try_exec(t_minishell *ms, int i)
 	ft_strdel_free(&(ms->line));
 	ms->line = ft_strdup("");
 	get_path_arg(ms, i);
-	pipe(ms->pfd);
+	ft_printf("%s\n", ms->command);
+	if (ft_strchr(ms->command, '.') && ft_strchr(ms->command, '/'))
+	{
+		ms->command = ft_strtrim(ms->command, "./");
+		ms->command = ft_strjoin_free_s2("/", ms->command);
+		if (!(ms->argv[0] = malloc(sizeof(char) * 2000)))
+			ft_exit(ms);
+		getcwd(ms->argv[0], 2000);
+		ms->argv[0] = ft_strjoin_free_s1(ms->argv[0], ms->command);
+	}
 	id = fork();
 	if (id == 0)
 	{
 		close(ms->pfd[0]);
-		dup2(ms->pfd[1], 1);
 		if (execve(ms->argv[0], ms->argv, ms->envp) == -1)
 		{
-			dprintf(2, "%s\n", strerror(errno));
 			exit(1);
 		}
 	}
-	else
-	{
-		wait(0);
-		try_exec_read(ms);
-	}
+	wait(0);
 }
 
 void	get_different_option(t_minishell *ms, int i)
 {
 	if (!(get_command(ms, i)))
 		ft_exit(ms);
-	ft_printf("%s\n", ms->command);
 	if (ft_strcmp(ms->command, "echo") == 0)
 		get_echo(ms, i);
 	else if (ft_strcmp(ms->command, "pwd") == 0)

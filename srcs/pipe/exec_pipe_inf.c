@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipe_inf.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
+/*   By: pbesson <pbesson@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:39:13 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/28 12:12:27 by wasayad          ###   ########lyon.fr   */
+/*   Updated: 2021/02/01 13:28:56 by pbesson          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ void	try_exec_pipe_inf(t_minishell *ms, int i)
 	}
 	else
 	{
+		signal_handler(id);			// get id for signal_handler
 		wait(0);
 		try_exec_pipe_inf_read(ms, i);
 	}

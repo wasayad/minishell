@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipe.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
+/*   By: pbesson <pbesson@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:32:27 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/28 12:12:49 by wasayad          ###   ########lyon.fr   */
+/*   Updated: 2021/01/29 16:46:22 by pbesson          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,7 @@ static void	get_path_arg_pipe(t_minishell *ms, int k)
 	ms->argv = ft_split(ms->command_pipe[k], ' ');
 	ms->argv[0] = tempo;
 }
-
-#include "stdio.h"
+#include <stdio.h>
 static void	try_exec_pipe(t_minishell *ms, int k)
 {
 	int		id;
@@ -60,6 +59,7 @@ static void	try_exec_pipe(t_minishell *ms, int k)
 		dprintf(2, "%s\n", strerror(errno));
 		exit(1);
 	}
+	signal_handler(id);			// get id for signal_handler
 	wait(0);
 }
 

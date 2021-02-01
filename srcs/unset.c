@@ -1,7 +1,5 @@
 #include "../includes/minishell.h"
 
-//NORME
-
 int		check_var_unset(t_minishell *ms)
 {
 	int		i;
@@ -13,21 +11,22 @@ int		check_var_unset(t_minishell *ms)
 			ms->line[i] != '_' && ms->line[i] != ' ')
 		{
 			ft_printf("wrong ID\n");
-			return(0);
+			return (0);
 		}
 		i++;
 	}
 	if (!(ms->line = ft_substr_free(ms->line, 0, i)))
 		ft_exit(ms);
-	return(1);
+	return (1);
 }
 
-void    ft_unset(t_minishell *ms)
+void	ft_unset(t_minishell *ms)
 {
 	t_env_var	*temp;
 	t_env_var	*temp_swap;
-    if (check_var_unset(ms))
-    {
+
+	if (check_var_unset(ms))
+	{
 		temp = ms->ev;
 		while (temp->last != 1)
 		{
@@ -41,7 +40,7 @@ void    ft_unset(t_minishell *ms)
 				temp_swap->next_var = temp->next_var;
 				free(temp);
 				temp = temp_swap;
-				break;
+				break ;
 			}
 			temp = temp->next_var;
 		}
@@ -54,5 +53,5 @@ void    ft_unset(t_minishell *ms)
 			free(temp);
 			temp = temp_swap;
 		}
-    }
+	}
 }
