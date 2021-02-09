@@ -3,14 +3,14 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: pbesson <pbesson@student.42lyon.fr>        +#+  +:+       +#+         #
+#    By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/14 14:02:44 by pbesson           #+#    #+#              #
-#    Updated: 2021/02/01 12:19:40 by pbesson          ###   ########lyon.fr    #
+#    Updated: 2021/02/08 17:22:52 by wasayad          ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
-SRC =	srcs/main2.c\
+SRC =	main.c\
 		srcs/echo.c\
 		srcs/utils.c\
 		srcs/exit.c\
@@ -25,9 +25,11 @@ SRC =	srcs/main2.c\
 		srcs/pipe/pipe.c\
 		srcs/pipe/pipe_inf.c\
 		srcs/pipe/exec_pipe.c\
+		srcs/pipe/get_path_arg.c\
 		srcs/inf/inf.c\
 		srcs/inf/exec_inf.c\
-		srcs/signal.c
+		srcs/signal.c\
+		srcs/parsing_utils.c
 		
 
 LIBFT_PATH = ./libft

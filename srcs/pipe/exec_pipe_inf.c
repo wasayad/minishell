@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipe_inf.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbesson <pbesson@student.42lyon.fr>        +#+  +:+       +#+        */
+/*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:39:13 by wasayad           #+#    #+#             */
-/*   Updated: 2021/02/01 13:28:56 by pbesson          ###   ########lyon.fr   */
+/*   Updated: 2021/02/08 16:31:51 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,34 +41,27 @@ void	get_path_arg_pipe_inf(t_minishell *ms)
 	char		**path;
 	int			i;
 	char		*tempo;
-	int			id;
 
 	i = -1;
-	temp = ms->ev;
+	tempo = NULL;
+	path = NULL;
+	temp = ms->ev->next_var;
 	if (ms->command[0] == '/')
-	{
 		tempo = ft_strdup(ms->command);
-	}
 	else
 	{
-		while (temp->last != 1 && ft_strcmp(temp->var, "PATH") != 0)
-			temp = temp->next_var;
-		path = ft_split(temp->content, ':');
-		while (path[++i])
-		{
-			tempo = ft_strjoin(path[i], "/");
-			tempo = ft_strjoin_free_s1(tempo, ms->command);
-			id = open(tempo, O_RDONLY);
-			if (id > 0)
-				break ;
-			close(id);
-			free(tempo);
-		}
+		gpapin(ms, temp, path, &tempo);
 	}
 	ms->command_inf[0] = ft_strjoin_free_s2(" ", ms->command_inf[0]);
 	ms->command_inf[0] = ft_strjoin_free_s2(ms->command, ms->command_inf[0]);
 	ms->argv = ft_split(ms->command_inf[0], ' ');
-	ms->argv[0] = tempo;
+	free(ms->argv[0]);
+	ms->argv[0] = ft_strdup(tempo);
+	i = -1;
+	ft_strdel_free(&(tempo));
+	while (path && path[++i])
+		free(path[i]);
+	free(path);
 }
 
 void	try_exec_pipe_inf_read(t_minishell *ms, int i)
@@ -92,11 +85,12 @@ void	try_exec_pipe_inf_read(t_minishell *ms, int i)
 	}
 }
 
-#include "stdio.h"
 void	try_exec_pipe_inf(t_minishell *ms, int i)
 {
 	int		id;
+	int		j;
 
+	j = -1;
 	get_path_arg_pipe_inf(ms);
 	pipe(ms->pfd);
 	id = fork();
@@ -106,12 +100,15 @@ void	try_exec_pipe_inf(t_minishell *ms, int i)
 		if (!(ft_strchr(ms->command_pipe[i], -52)))
 			dup2(ms->pfd[1], 1);
 		execve(ms->argv[0], ms->argv, ms->envp);
-		dprintf(2, "%s\n", strerror(errno));
+		ft_printf("%s\n", strerror(errno));
 		exit(1);
 	}
 	else
 	{
-		signal_handler(id);			// get id for signal_handler
+		while (ms->argv[++j])
+			free(ms->argv[j]);
+		free(ms->argv);
+		signal_handler(id);
 		wait(0);
 		try_exec_pipe_inf_read(ms, i);
 	}
@@ -130,9 +127,9 @@ void	get_different_option_pipe_inf(t_minishell *ms, int i)
 	else if (ft_strcmp(ms->command, "exit") == 0)
 		ft_printf("");
 	else if (ft_strcmp(ms->command, "export") == 0)
-		ft_export(ms);
+		ft_export(ms, i);
 	else if (ft_strcmp(ms->command, "unset") == 0)
-		ft_unset(ms);
+		ft_unset(ms, i);
 	else if (ft_strcmp(ms->command, "env") == 0)
 		ft_env(ms);
 	else

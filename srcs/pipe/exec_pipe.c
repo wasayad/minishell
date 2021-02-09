@@ -3,14 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipe.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbesson <pbesson@student.42lyon.fr>        +#+  +:+       +#+        */
+/*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:32:27 by wasayad           #+#    #+#             */
-/*   Updated: 2021/01/29 16:46:22 by pbesson          ###   ########lyon.fr   */
+/*   Updated: 2021/02/08 16:59:57 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
+
+static void	get_path_arg_pipe_norme(t_minishell *ms,
+		t_env_var *temp, char **tempo, char **path)
+{
+	int			id;
+	int			i;
+
+	i = -1;
+	if (ms->command[0] == '/')
+		*tempo = ft_strdup(ms->command);
+	else
+	{
+		while (temp->next_var && ft_strcmp(temp->var, "PATH") != 0)
+			temp = temp->next_var;
+		path = ft_split(temp->content, ':');
+		while (path[++i])
+		{
+			*tempo = ft_strjoin(path[i], "/");
+			*tempo = ft_strjoin_free_s1(*tempo, ms->command);
+			id = open(*tempo, O_RDONLY);
+			if (id > 0)
+				break ;
+			close(id);
+			free(*tempo);
+		}
+	}
+}
 
 static void	get_path_arg_pipe(t_minishell *ms, int k)
 {
@@ -18,48 +45,45 @@ static void	get_path_arg_pipe(t_minishell *ms, int k)
 	char		**path;
 	int			i;
 	char		*tempo;
-	int			id;
 
 	i = -1;
-	temp = ms->ev;
-	if (ms->command[0] == '/')
-	{
-		tempo = ft_strdup(ms->command);
-	}
-	else
-	{
-		while (temp->last != 1 && ft_strcmp(temp->var, "PATH") != 0)
-			temp = temp->next_var;
-		path = ft_split(temp->content, ':');
-		while (path[++i])
-		{
-			tempo = ft_strjoin(path[i], "/");
-			tempo = ft_strjoin_free_s1(tempo, ms->command);
-			id = open(tempo, O_RDONLY);
-			if (id > 0)
-				break ;
-			close(id);
-			free(tempo);
-		}
-	}
+	temp = ms->ev->next_var;
+	path = NULL;
+	get_path_arg_pipe_norme(ms, temp, &tempo, path);
 	ms->command_pipe[k] = ft_strjoin_free_s2(" ", ms->command_pipe[k]);
 	ms->command_pipe[k] = ft_strjoin_free_s2(ms->command, ms->command_pipe[k]);
 	ms->argv = ft_split(ms->command_pipe[k], ' ');
-	ms->argv[0] = tempo;
+	free(ms->argv[0]);
+	ms->argv[0] = ft_strdup(tempo);
+	i = -1;
+	ft_strdel_free(&(tempo));
+	while (path && path[++i])
+		free(path[i]);
+	free(path);
 }
-#include <stdio.h>
+
 static void	try_exec_pipe(t_minishell *ms, int k)
 {
 	int		id;
-	get_path_arg_pipe(ms, k);
+	int		i;
+
+	i = -1;
 	id = fork();
+	get_path_arg_pipe(ms, k);
 	if (id == 0)
 	{
-		execve(ms->argv[0], ms->argv, ms->envp);
+		get_environement(ms);
+		execve(ms->argv[0], ms->argv, ms->envps);
 		dprintf(2, "%s\n", strerror(errno));
 		exit(1);
 	}
-	signal_handler(id);			// get id for signal_handler
+	else
+	{
+		while (ms->argv[++i])
+			free(ms->argv[i]);
+		free(ms->argv);
+	}
+	signal_handler(id);
 	wait(0);
 }
 
@@ -69,7 +93,6 @@ static int	get_command_pipe(t_minishell *ms, int k)
 	int j;
 
 	i = 0;
-	j = 0;
 	while (ms->command_pipe[k][i] && ms->command_pipe[k][i] == ' ')
 		i++;
 	j = i;
@@ -85,7 +108,7 @@ static int	get_command_pipe(t_minishell *ms, int k)
 	return (1);
 }
 
-void	get_different_option_pipe(t_minishell *ms, int i)
+void		get_different_option_pipe(t_minishell *ms, int i)
 {
 	if (!(get_command_pipe(ms, i)))
 		ft_exit(ms);
@@ -97,10 +120,8 @@ void	get_different_option_pipe(t_minishell *ms, int i)
 		ft_printf("");
 	else if (ft_strcmp(ms->command, "pwd") == 0)
 		ft_pwd(ms);
-	else if (ft_strcmp(ms->command, "export") == 0)
-		ft_export(ms);
 	else if (ft_strcmp(ms->command, "unset") == 0)
-		ft_unset(ms);
+		ft_unset(ms, i);
 	else if (ft_strcmp(ms->command, "env") == 0)
 		ft_env(ms);
 	else

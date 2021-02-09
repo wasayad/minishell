@@ -3,27 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbesson <pbesson@student.42lyon.fr>        +#+  +:+       +#+        */
+/*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 12:40:30 by pbesson           #+#    #+#             */
-/*   Updated: 2021/02/01 12:40:33 by pbesson          ###   ########lyon.fr   */
+/*   Updated: 2021/02/08 15:42:56 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+#include <stdio.h>
 
+//RAJOUTER DES PRINTF ET FREE LINE 
 int	get_echo(t_minishell *ms, int i)
 {
 	if (ms->command_tab[i][0] == '-' && ms->command_tab[i][1] == 'n')
 	{
 		if (!(get_command(ms, i)))
 			return (0);
+		ft_strdel_free(&(ms->line));
 		ms->line = ft_strdup(ms->command_tab[i]);
 	}
 	else
 	{
 		ft_strdel_free(&(ms->line));
-		ms->line = ft_strjoin_free_s1(ms->command_tab[i], "\n");
+		ms->line = ft_strjoin(ms->command_tab[i], "\n");
 	}
 	return (1);
 }
@@ -37,9 +40,10 @@ int	get_echo_pipe(t_minishell *ms, int i)
 	}
 	else
 	{
+		ms->command_pipe[i] = ft_strtrim_free(ms->command_pipe[i], " ");
 		ft_printf("%s\n", ms->command_pipe[i]);
 		ft_strdel_free(&(ms->line));
-		ms->line = ft_strjoin_free_s1(ms->command_pipe[i], "\n");
+		ms->line = ft_strjoin_free(ms->command_pipe[i], "\n");
 	}
 	return (1);
 }

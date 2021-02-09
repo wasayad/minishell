@@ -7,15 +7,15 @@
 # include <sys/wait.h>
 # include <signal.h>
 # include <string.h>
+# include <stdio.h>
+
 
 typedef struct		env_var
 {
 	char		*var;
 	char		*content;
-	void		*first_var;
 	void		*next_var;
 	void		*prev_var;
-	int			last;
 }					t_env_var;
 
 typedef struct		s_minishell
@@ -33,6 +33,7 @@ typedef struct		s_minishell
 	char		**argv;
 	char		**envp;
 	char		**exec_arg;
+	char		**envps;
 	t_env_var	*ev;
 }					t_minishell;
 
@@ -50,8 +51,8 @@ void		ft_pwd(t_minishell *ms);
 int			ft_cd(t_minishell *ms, int j);
 void		check_exit(t_minishell *ms, int j);
 void		ft_exit(t_minishell *ms);
-int			ft_export(t_minishell *ms);
-void		ft_unset(t_minishell *ms);
+int			ft_export(t_minishell *ms, int i);
+void		ft_unset(t_minishell *ms, int i);
 void		ft_env(t_minishell *ms);
 
 void		manage_inf(t_minishell *ms, int i);
@@ -63,6 +64,7 @@ void		get_different_option(t_minishell *ms, int i);
 void		get_different_option_pipe(t_minishell *ms, int i);
 void		get_different_option_pipe_inf(t_minishell *ms, int i);
 int			get_command_pipe_inf(t_minishell *ms, int k);
+void		gpapin(t_minishell *ms, t_env_var *t, char **path, char **tempo);
 
 int			ischaracter_quotes(t_minishell *ms, int i);
 int			ischaracter_squotes(t_minishell *ms, int i);
@@ -78,5 +80,7 @@ int			get_echo_inf(t_minishell *ms, int i);
 
 void		ft_error(t_minishell *ms);
 void		ft_error_ls(t_minishell *ms);
+void		get_environement(t_minishell *ms);
+void		ft_add_shlvl(t_minishell *ms);
 
 #endif

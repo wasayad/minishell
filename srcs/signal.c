@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbesson <pbesson@student.42lyon.fr>        +#+  +:+       +#+        */
+/*   By: wasayad <wasayad@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 12:18:48 by pbesson           #+#    #+#             */
-/*   Updated: 2021/02/01 12:22:40 by pbesson          ###   ########lyon.fr   */
+/*   Updated: 2021/02/05 11:04:29 by wasayad          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	signal_handler(int signum)
 {
-static int pid;
+	static int pid;
 
 	if (signum > 32)
 	{
